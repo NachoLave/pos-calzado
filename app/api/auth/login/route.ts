@@ -9,6 +9,8 @@ import type { User } from "@/lib/db/models"
 import { verifyPassword } from "@/lib/auth/password"
 import { createSession } from "@/lib/auth/session"
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json()

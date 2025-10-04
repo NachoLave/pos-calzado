@@ -8,6 +8,8 @@ import { Collections } from "@/lib/db/collections"
 import { getSession } from "@/lib/auth/session"
 import { ObjectId } from "mongodb"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const session = await getSession()

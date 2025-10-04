@@ -13,65 +13,31 @@ const uri = process.env.MONGODB_URI
 
 // Configuración optimizada específicamente para Vercel Serverless Functions
 const options = {
-  // Configuraciones SSL/TLS optimizadas para Vercel
-  authMechanism: 'SCRAM-SHA-1',
+  // Configuraciones básicas para Vercel
   retryWrites: true,
   w: 'majority',
   
-  // Configuraciones de connection
-  maxPoolSize: 1, // Reducido para serverless
-  serverSelectionTimeoutMS: 3000, // Timeout más corto
+  // Configuraciones de timeout optimizadas para serverless
+  serverSelectionTimeoutMS: 5000,
   connectTimeoutMS: 10000,
-  socketTimeoutMS: 0, // Sin timeout de socket para serverless
+  socketTimeoutMS: 45000,
   
-  // Configuraciones modernas
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  // Pool de conexiones reducido para serverless
+  maxPoolSize: 1,
   
-  // Configuraciones SSL específicas para Vercel
-  tls: true,
-  tlsAllowInvalidCertificates: false,
-  tlsAllowInvalidHostnames: false,
-  tlsInsecure: false,
-  
-  // Configuraciones de red optimizadas para Vercel
-  maxIdleTimeMS: 10000,
-  heartbeatFrequencyMS: 10000,
-  directConnection: false
+  // Configuraciones SSL simplificadas
+  tls: true
 }
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>
 
-// Optimización para serverless (Vercel)
-let isConnected = false
-let connectionPromise: Promise<MongoClient> | null = null
-
-async function connectToDatabase() {
-  if (isConnected && client) {
-    return client
-  }
-
-  if (connectionPromise) {
-    return connectionPromise
-  }
-
-  connectionPromise = (async () => {
-    try {
-      client = new MongoClient(uri, options)
-      await client.connect()
-      isConnected = true
-      console.log('[MongoDB] Connected via Vercel')
-      return client
-    } catch (error) {
-      console.error('[MongoDB] Connection error:', error)
-      isConnected = false
-      connectionPromise = null
-      throw error
-    }
-  })()
-
-  return connectionPromise
+// Simplificación para Vercel
+async function createConnection(): Promise<MongoClient> {
+  const mongoClient = new MongoClient(uri, options)
+  await mongoClient.connect()
+  console.log('[MongoDB] Connected successfully')
+  return mongoClient
 }
 
 // En desarrollo, usar una variable global para preservar la conexión entre hot reloads
@@ -87,8 +53,8 @@ if (process.env.NODE_ENV === "development") {
   }
   clientPromise = global._mongoClientPromise
 } else {
-  // En producción (Vercel), usar configuración optimizada
-  clientPromise = connectToDatabase()
+  // En producción (Vercel), crear nueva conexión simplificada
+  clientPromise = createConnection()
 }
 
 /**

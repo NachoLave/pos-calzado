@@ -1,0 +1,26 @@
+{
+  "name": "POS Calzado",
+  "short_name": "POS Calzado",
+  "description": "Sistema de punto de venta para calzado y accesorios",
+  "start_url": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen"],
+  "orientation": "any",
+  "background_color": "#1e40af",
+  "theme_color": "#1e40af",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": [],
+  "features": [
+    "Cross Platform",
+    "fast",
+    "simple"
+  ],
+  "prefer_related_applications": false
+}

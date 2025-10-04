@@ -80,7 +80,7 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 h-full w-64 transform border-r border-border bg-card transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 z-40 h-full w-64 transform border-r border-border bg-card transition-transform duration-300 ease-in-out fullscreen-sidebar ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

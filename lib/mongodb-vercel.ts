@@ -45,58 +45,33 @@ let clientPromise: Promise<MongoClient>
 
 // Optimización para serverless (Vercel)
 let isConnected = false
-let connectionPromise: Promise<MongoClient> | null = null
 
 async function connectToDatabase() {
   if (isConnected && client) {
     return client
   }
 
-  if (connectionPromise) {
-    return connectionPromise
+  try {
+    client = new MongoClient(uri, options)
+    await client.connect()
+    isConnected = true
+    console.log('Connected to MongoDB Atlas via Vercel')
+    return client
+  } catch (error) {
+    console.error('MongoDB connection error:', error)
+    isConnected = false
+    throw error
   }
-
-  connectionPromise = (async () => {
-    try {
-      client = new MongoClient(uri, options)
-      await client.connect()
-      isConnected = true
-      console.log('[MongoDB] Connected via Vercel')
-      return client
-    } catch (error) {
-      console.error('[MongoDB] Connection error:', error)
-      isConnected = false
-      connectionPromise = null
-      throw error
-    }
-  })()
-
-  return connectionPromise
 }
 
-// En desarrollo, usar una variable global para preservar la conexión entre hot reloads
-declare global {
-  var _mongoClientPromise: Promise<MongoClient> | undefined
-}
-
-if (process.env.NODE_ENV === "development") {
-  // En desarrollo, usar variable global para no crear múltiples conexiones
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, { ...options, maxPoolSize: 10 }) // Más conexiones en desarrollo
-    global._mongoClientPromise = client.connect()
-  }
-  clientPromise = global._mongoClientPromise
-} else {
-  // En producción (Vercel), usar configuración optimizada
-  clientPromise = connectToDatabase()
-}
+clientPromise = connectToDatabase()
 
 /**
  * Obtiene la instancia de la base de datos
  */
 export async function getDb(): Promise<Db> {
-  const client = await clientPromise
-  return client.db("pos_calzado")
+  const mongoClient = await clientPromise
+  return mongoClient.db("pos_calzado")
 }
 
 export default clientPromise
